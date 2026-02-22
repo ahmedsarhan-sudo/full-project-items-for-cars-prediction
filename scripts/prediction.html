@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEURAL-CAR | EXECUTIVE VALUATION SYSTEM</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400&family=Outfit:wght@300;400;600;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --secondary: #6366f1;
+            --bg-dark: #020617;
+            --glass: rgba(15, 23, 42, 0.8);
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-dark);
+            color: #f1f5f9;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(14, 165, 233, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(99, 102, 241, 0.05) 0%, transparent 40%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .brand-header { font-family: 'Syne', sans-serif; }
+        .data-mono { font-family: 'Fira Code', monospace; }
+
+        /* Smooth Loading Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: revealUp 0.8s cubic-bezier(0.2, 1, 0.3, 1) forwards;
+        }
+        @keyframes revealUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Glassmorphism Logic */
+        .luxury-glass {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 3D Image Hover Cards (Integrated from your old design) */
+        .car-hover-card {
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: brightness(0.7) grayscale(30%);
+            cursor: pointer;
+        }
+        .car-hover-card:hover {
+            filter: brightness(1.1) grayscale(0%);
+            transform: scale(1.1) translateY(-10px);
+            box-shadow: 0 0 30px rgba(14, 165, 233, 0.3);
+            z-index: 50;
+        }
+
+        /* Input Styling */
+        .input-luxury {
+            width: 100%;
+            background-color: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1rem;
+            color: white;
+            transition: all 0.3s ease;
+            outline: none;
+            appearance: none;
+        }
+        
+        .input-luxury:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(14, 165, 233, 0.2);
+            background-color: rgba(15, 23, 42, 0.8);
+        }
+
+        .select-wrapper { position: relative; }
+        .select-wrapper::after {
+            content: '\f107';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            pointer-events: none;
+        }
+
+        /* Luxury Button Styling */
+        .btn-legendary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+        .btn-legendary:hover {
+            box-shadow: 0 0 40px rgba(14, 165, 233, 0.4);
+            transform: translateY(-2px);
+            letter-spacing: 1px;
+        }
+
+        #hud-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.98);
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 lg:p-12">
+
+    <div id="hud-overlay" class="flex">
+        <div class="relative w-32 h-32 mb-10">
+            <div class="absolute inset-0 border-4 border-sky-500/20 rounded-full"></div>
+            <div class="absolute inset-0 border-t-4 border-sky-500 rounded-full animate-spin"></div>
+            <i class="fas fa-microchip absolute inset-0 flex items-center justify-center text-3xl text-sky-500"></i>
+        </div>
+        <h2 class="brand-header text-3xl tracking-tighter mb-4 text-white uppercase italic">Neural Processing</h2>
+        <div id="hud-log" class="data-mono text-xs text-sky-400/60 text-center space-y-2"></div>
+    </div>
+
+    <header class="max-w-7xl mx-auto mb-12 text-center reveal" style="animation-delay: 0.1s;">
+        <div class="flex justify-center items-center gap-3 mb-4">
+            <span class="h-[1px] w-12 bg-sky-500/50"></span>
+            <span class="text-xs tracking-[0.4em] uppercase text-sky-400 font-semibold">AI Valuation System v2.0</span>
+            <span class="h-[1px] w-12 bg-sky-500/50"></span>
+        </div>
+        <h1 class="brand-header text-5xl md:text-7xl font-extrabold mb-6 tracking-tight text-white">
+            NEURAL<span class="text-sky-500">CAR</span>
+        </h1>
+    </header>
+
+    <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-6 mb-16 reveal" style="animation-delay: 0.3s;">
+        <div class="car-hover-card luxury-glass rounded-3xl overflow-hidden aspect-[4/5] relative group">
+            <img src="https://images.unsplash.com/photo-1555215695-3004980ad54e?w=500" class="h-full w-full object-cover">
+            <div class="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black to-transparent">
+                <p class="text-xs font-bold tracking-widest text-white uppercase">BMW M-Series</p>
+            </div>
+        </div>
+        <div class="car-hover-card luxury-glass rounded-3xl overflow-hidden aspect-[4/5] relative group">
+            <img src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=500" class="h-full w-full object-cover">
+            <div class="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black to-transparent">
+                <p class="text-xs font-bold tracking-widest text-white uppercase">Mercedes AMG</p>
+            </div>
+        </div>
+        <div class="car-hover-card luxury-glass rounded-3xl overflow-hidden aspect-[4/5] relative group">
+            <img src="https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=500" class="h-full w-full object-cover">
+            <div class="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black to-transparent">
+                <p class="text-xs font-bold tracking-widest text-white uppercase">Lamborghini</p>
+            </div>
+        </div>
+        <div class="car-hover-card luxury-glass rounded-3xl overflow-hidden aspect-[4/5] relative group">
+            <img src="https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=500" class="h-full w-full object-cover">
+            <div class="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black to-transparent">
+                <p class="text-xs font-bold tracking-widest text-white uppercase">Tesla Model S</p>
+            </div>
+        </div>
+        <div class="car-hover-card luxury-glass rounded-3xl overflow-hidden aspect-[4/5] relative group">
+            <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=500" class="h-full w-full object-cover">
+            <div class="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black to-transparent">
+                <p class="text-xs font-bold tracking-widest text-white uppercase">Chevy Corvette</p>
+            </div>
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <section class="lg:col-span-2 luxury-glass rounded-[40px] p-8 md:p-10 reveal shadow-2xl" style="animation-delay: 0.4s;">
+            <div class="flex items-center gap-4 mb-8 border-b border-white/5 pb-6">
+                <div class="w-12 h-12 rounded-2xl bg-sky-500/10 flex items-center justify-center text-sky-400">
+                    <i class="fas fa-sliders text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="brand-header text-xl text-white">VEHICLE CONFIGURATION</h2>
+                    <p class="text-[10px] data-mono text-slate-500 uppercase tracking-widest">Enter all 15 parameters</p>
+                </div>
+            </div>
+
+            <form id="predictionForm" class="space-y-6">
+                <h3 class="text-xs text-sky-500 font-bold uppercase tracking-widest mb-2">I. Identity</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="space-y-1 select-wrapper">
+                        <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">Manufacturer</label>
+                        <select id="Manufacturer" onchange="loadModels()" class="input-luxury">
+                            <option value="">Select Brand...</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1 select-wrapper">
+                        <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">Model</label>
+                        <select id="Model" disabled class="input-luxury opacity-50">
+                            <option value="">Waiting...</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">Prod. Year</label>
+                        <input type="number" id="Prod_year" placeholder="e.g. 2015" class="input-luxury">
+                    </div>
+                </div>
+
+                <h3 class="text-xs text-sky-500 font-bold uppercase tracking-widest mb-2">II. Technical Specs</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">Levy</label>
+                        <input type="number" id="Levy" placeholder="1399" class="input-luxury">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">Engine (L)</label>
+                        <input type="number" step="0.1" id="Engine_volume" placeholder="3.5" class="input-luxury">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">Mileage (km)</label>
+                        <input type="number" id="Mileage" placeholder="185000" class="input-luxury">
+                    </div>
+                    <div class="space-y-1 select-wrapper">
+                        <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">Cylinders</label>
+                        <select id="Cylinders" class="input-luxury">
+                            <option value="4">4</option><option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                            <option value="5">5</option><option value="6">6</option><option value="7">7</option>
+                            <option value="8">8</option><option value="10">10</option><option value="12">12</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h3 class="text-xs text-sky-500 font-bold uppercase tracking-widest mb-2">III. Mechanics</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="space-y-1 select-wrapper">
+                        <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">Fuel Type</label>
+                        <select id="Fuel_type" class="input-luxury">
+                            <option>Petrol</option><option>Hybrid</option><option>Diesel</option><option>CNG</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1 select-wrapper">
+                        <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">Gear Box</label>
+                        <select id="Gear_box_type" class="input-luxury">
+                            <option>Automatic</option><option>Tiptronic</option><option>Variator</option><option>Manual</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1 select-wrapper">
+                        <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">Drive Wheels</label>
+                        <select id="Drive_wheels" class="input-luxury">
+                            <option>Front</option><option>4x4</option><option>Rear</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1 select-wrapper">
+                        <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">Wheel Side</label>
+                        <select id="Wheel" class="input-luxury">
+                            <option>Left wheel</option><option>Right-hand drive</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h3 class="text-xs text-sky-500 font-bold uppercase tracking-widest mb-2">IV. Body & Style</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="space-y-1 select-wrapper">
+                        <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">Category</label>
+                        <select id="Category" class="input-luxury">
+                            <option>Sedan</option><option>Jeep</option><option>Hatchback</option><option>Coupe</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1 select-wrapper">
+                        <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">Color</label>
+                        <select id="Color" class="input-luxury">
+                            <option>Black</option><option>Silver</option><option>White</option><option>Grey</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1 select-wrapper">
+                        <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">Leather</label>
+                        <select id="Leather_interior" class="input-luxury">
+                            <option>Yes</option><option>No</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1 select-wrapper">
+                        <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">Airbags</label>
+                        <select id="Airbags" class="input-luxury">
+                            <option value="4">4</option><option value="0">0</option><option value="12">12</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="button" onclick="initiateExecutivePrediction()" class="w-full btn-legendary text-white font-extrabold py-5 rounded-2xl uppercase tracking-[0.2em] text-sm shadow-lg flex justify-center items-center gap-3">
+                    <span>Calculate Market Value</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+        </section>
+
+        <aside class="flex flex-col gap-6 reveal" style="animation-delay: 0.6s;">
+            <div class="luxury-glass rounded-[40px] p-8 flex-1 flex flex-col justify-center items-center text-center relative overflow-hidden group min-h-[400px]">
+                <div class="absolute inset-0 bg-sky-500/5 animate-pulse group-hover:bg-sky-500/10 transition-all"></div>
+                
+                <div id="idle-display">
+                    <div class="w-24 h-24 rounded-full border border-white/5 bg-slate-900/50 flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-chart-line text-3xl text-slate-600"></i>
+                    </div>
+                    <h3 class="brand-header text-xl text-slate-400">READY TO PREDICT</h3>
+                    <p class="text-xs text-slate-500 mt-2 max-w-[200px] mx-auto">Fill in all 15 vehicle parameters and initiate the neural network.</p>
+                </div>
+
+                <div id="result-display" class="hidden w-full">
+                    <span class="text-[10px] tracking-[0.3em] text-sky-500 font-bold uppercase mb-4 block">Estimated Value</span>
+                    <div class="flex items-start justify-center text-white brand-header">
+                        <span class="text-4xl mt-2 mr-1 text-slate-400">$</span>
+                        <h2 id="priceTarget" class="text-6xl md:text-7xl font-extrabold tracking-tighter">0</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="luxury-glass rounded-[40px] p-6 h-40 bg-black/40 border-l-2 border-sky-500 overflow-hidden">
+                <div class="flex items-center gap-2 mb-3">
+                    <i class="fas fa-terminal text-[10px] text-sky-500"></i>
+                    <span class="text-[9px] font-bold tracking-widest text-slate-500 uppercase">System Logs</span>
+                </div>
+                <div id="terminal-log" class="text-[10px] data-mono text-sky-900/80 leading-relaxed overflow-y-auto h-full">
+                    <p>> SYSTEM_READY. AWAITING_INPUT...</p>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <script>
+        const terminalLog = (msg) => {
+            const log = document.getElementById('terminal-log');
+            const p = document.createElement('p');
+            p.innerHTML = `> ${new Date().toLocaleTimeString()}: ${msg}`;
+            log.prepend(p);
+        }
+
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString();
+                if (progress < 1) window.requestAnimationFrame(step);
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        async function loadManufacturers() {
+            try {
+                const res = await fetch("/manufacturers");
+                const data = await res.json();
+                const select = document.getElementById("Manufacturer");
+                select.innerHTML = '<option value="">Select Brand...</option>';
+                data.manufacturers.forEach(m => select.add(new Option(m, m)));
+                terminalLog("DB_CONNECTED: Manufacturers loaded.");
+            } catch (e) { terminalLog("ERR: Could not load manufacturers."); }
+        }
+
+        async function loadModels() {
+            const mfr = document.getElementById("Manufacturer").value;
+            const modelSelect = document.getElementById("Model");
+            if (!mfr) {
+                modelSelect.disabled = true;
+                modelSelect.classList.add('opacity-50');
+                return;
+            }
+            modelSelect.disabled = false;
+            modelSelect.classList.remove('opacity-50');
+            modelSelect.innerHTML = "<option>Loading...</option>";
+            try {
+                const res = await fetch(`/models/${mfr}`);
+                const data = await res.json();
+                modelSelect.innerHTML = '<option value="">Select Model</option>';
+                data.models.forEach(m => modelSelect.add(new Option(m, m)));
+                terminalLog(`DATA_FETCH: Loaded models for ${mfr}`);
+            } catch (e) { terminalLog("ERR: Model fetch failed."); }
+        }
+
+        async function initiateExecutivePrediction() {
+            const mfr = document.getElementById("Manufacturer").value;
+            const model = document.getElementById("Model").value;
+            const year = document.getElementById("Prod_year").value;
+
+            if (!mfr || !model || !year) {
+                alert("Please complete the required fields (Manufacturer, Model, Year).");
+                return;
+            }
+
+            const hud = document.getElementById('hud-overlay');
+            const hudLog = document.getElementById('hud-log');
+            hud.style.display = 'flex';
+            setTimeout(() => hud.style.opacity = '1', 10);
+            hudLog.innerHTML = "";
+
+            const steps = ["Validating inputs...", "Vectorizing features...", "Querying Neural Network..."];
+            for (let step of steps) {
+                const p = document.createElement('p');
+                p.innerText = `> ${step}`;
+                hudLog.appendChild(p);
+                await new Promise(r => setTimeout(r, 400));
+            }
+
+            const payload = {
+                Levy: parseInt(document.getElementById("Levy").value) || 0,
+                Manufacturer: mfr,
+                Model: model,
+                Prod_year: parseInt(year),
+                Category: document.getElementById("Category").value,
+                Leather_interior: document.getElementById("Leather_interior").value,
+                Fuel_type: document.getElementById("Fuel_type").value,
+                Engine_volume: parseFloat(document.getElementById("Engine_volume").value) || 0,
+                Mileage: parseInt(document.getElementById("Mileage").value) || 0,
+                Cylinders: parseFloat(document.getElementById("Cylinders").value),
+                Gear_box_type: document.getElementById("Gear_box_type").value,
+                Drive_wheels: document.getElementById("Drive_wheels").value,
+                Wheel: document.getElementById("Wheel").value,
+                Color: document.getElementById("Color").value,
+                Airbags: parseInt(document.getElementById("Airbags").value)
+            };
+
+            try {
+                const res = await fetch("/predict", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                const predictedPrice = Math.round(data.Prediction);
+
+                hud.style.opacity = '0';
+                setTimeout(() => hud.style.display = 'none', 500);
+
+                document.getElementById('idle-display').classList.add('hidden');
+                document.getElementById('result-display').classList.remove('hidden');
+                animateValue(document.getElementById('priceTarget'), 0, predictedPrice, 1500);
+                terminalLog(`SUCCESS: Valuation completed ($${predictedPrice})`);
+            } catch (e) {
+                hud.style.display = 'none';
+                terminalLog("ERR: Connection lost.");
+                alert("Prediction Failed.");
+            }
+        }
+        window.onload = loadManufacturers;
+    </script>
+</body>
+</html>
